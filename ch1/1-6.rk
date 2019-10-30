@@ -1,0 +1,52 @@
+#lang sicp
+
+;; Excercise 1.6: Do we need `if`? Why not define it in terms of `cond`?
+;;
+
+(define (new-if predicate then-clause else-clause)
+  (cond (predicate then-clause)
+        (else else-clause)))
+
+(new-if (= 2 3) 0 5)
+(new-if (= 1 1) 0 5)
+
+; Okay that works. Rewrite square-root?
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+;; Test to see if a guess has become good enough.
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+;; Newton's Method manipulation to get closer to the sqrt.
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+    guess
+    (sqrt-iter (improve guess x)
+               x)))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+(sqrt 4) ;; works.
+
+; No rewrite...
+
+(define (sqrt-iter2 guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (sqrt-iter2 (improve guess x)
+                      x)))
+
+(define (sqrt2 x)
+  (sqrt-iter2 1.0 x))
+
+(sqrt2 4)
+
+;; This gets stuck. Why? Because when using `cond` each parameter expression is evaluated even if
+;; the predicate does not match. With the special form `if` this does not happen because it is excempted
+;; from the normal model of (applicative) evaluation.
